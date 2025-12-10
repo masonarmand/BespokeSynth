@@ -346,6 +346,7 @@ std::string NoteCanvas::GetCurrentEditMeasureString() const
 
 bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
+   int ppo = TheScale->GetPitchesPerOctave();
    /*if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
    {
       int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
@@ -535,9 +536,9 @@ bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contr
                {
                   bool added = ToggleEditPitch(mEditCurrentPitchContext);
                   if (added)
-                     abletonGrid->DisplayScreenMessage("added " + NoteName(mEditCurrentPitchContext, false, true));
+                     abletonGrid->DisplayScreenMessage("added " + MicrotonalNoteName(mEditCurrentPitchContext, ppo, false, true));
                   else
-                     abletonGrid->DisplayScreenMessage("removed " + NoteName(mEditCurrentPitchContext, false, true));
+                     abletonGrid->DisplayScreenMessage("removed " + MicrotonalNoteName(mEditCurrentPitchContext, ppo, false, true));
                }
             }
 
@@ -686,9 +687,9 @@ bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contr
          {
             bool added = ToggleEditPitch(pressedPitch);
             /*if (added)
-               abletonGrid->DisplayScreenMessage("added " + NoteName(pressedPitch, false, true));
+               abletonGrid->DisplayScreenMessage("added " + MicrotonalNoteName(pressedPitch, false, true));
             else
-               abletonGrid->DisplayScreenMessage("removed " + NoteName(pressedPitch, false, true));*/
+               abletonGrid->DisplayScreenMessage("removed " + MicrotonalNoteName(pressedPitch, false, true));*/
          }
          return true;
       }
@@ -857,6 +858,7 @@ bool NoteCanvas::HasHighPriorityAbletonMoveScreenUpdate(IAbletonGridDevice* able
 
 bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd)
 {
+   int ppo = TheScale->GetPitchesPerOctave();
    if (!mCurrentEditElements.empty())
    {
       /*if (abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch))
@@ -891,7 +893,7 @@ bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Ableto
 
       for (const auto* element : mCurrentEditElements)
       {
-         lcd->DrawLCDText(NoteName(element->GetPitch(), false, true).c_str(), 10, y, LCDFONT_STYLE_REGULAR);
+         lcd->DrawLCDText(MicrotonalNoteName(element->GetPitch(), ppo, false, true).c_str(), 10, y, LCDFONT_STYLE_REGULAR);
          lcd->DrawLCDText(ofToString(element->GetVelocity(), 2).c_str(), 35, y, LCDFONT_STYLE_REGULAR);
          lcd->DrawLCDText(ofToString((element->mCol + element->mOffset) / stepsPerBeat, 3).c_str(), 60, y, LCDFONT_STYLE_REGULAR);
          lcd->DrawLCDText(ofToString(element->mLength / stepsPerBeat, 3).c_str(), 90, y, LCDFONT_STYLE_REGULAR);
@@ -911,6 +913,7 @@ bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Ableto
 
 void NoteCanvas::DrawModule()
 {
+   int ppo = TheScale->GetPitchesPerOctave();
    if (Minimized() || IsVisible() == false)
       return;
 
@@ -945,7 +948,7 @@ void NoteCanvas::DrawModule()
       float boxHeight = (float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows());
       float y = mCanvas->GetPosition(true).y + i * boxHeight;
       float scale = MIN(boxHeight - 2, 18);
-      DrawTextNormal(NoteName(pitch, false, true) + "(" + ofToString(pitch) + ")", mCanvas->GetPosition(true).x + 2, y - (scale / 8) + boxHeight, scale);
+      DrawTextNormal(MicrotonalNoteName(pitch, ppo, false, true) + "(" + ofToString(pitch) + ")", mCanvas->GetPosition(true).x + 2, y - (scale / 8) + boxHeight, scale);
    }
    ofPopStyle();
 
@@ -1374,3 +1377,4 @@ void NoteCanvas::LoadState(FileStreamIn& in, int rev)
 
    mCanvas->LoadState(in);
 }
+
