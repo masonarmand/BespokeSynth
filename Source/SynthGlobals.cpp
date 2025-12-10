@@ -385,6 +385,72 @@ std::string NoteName(int pitch, bool flat, bool includeOctave)
    return ret;
 }
 
+std::string MicrotonalNoteName(int pitch, int ppo, bool flat, bool includeOctave)
+{
+   int octave = pitch / ppo;
+   int step = pitch % ppo;
+   std::string base;
+
+   if (step < 0)
+      step += ppo;
+
+   switch (ppo) {
+      case 16:
+         static const char* names_16edo_sharps[16] = {
+            "Fb", "F", "F#", "G", "G#", "A", "A#", "B",
+            "B#", "Cb", "C", "C#", "D", "D#", "E", "E#",
+         };
+         static const char* names_16edo_flats[16] = {
+            "Fb", "F", "Gb", "G", "Ab", "A", "Bb", "B",
+            "B#", "Cb", "C", "Db", "D", "Eb", "E", "E#",
+         };
+         if (flat)
+            base = names_16edo_flats[step];
+         else
+            base = names_16edo_sharps[step];
+         break;
+      case 17:
+         static const char* names_17edo[17] = {
+            "G#", "A", "Bb", "A#", "B", "C", "Db", "C#",
+            "D", "Eb", "D#", "E", "F", "Gb", "F#", "G", "Ab",
+         };
+         base = names_17edo[step];
+         break;
+      case 19:
+         static const char* names_19edo_sharps[19] = {
+            "Db", "D", "D#", "Eb", "E", "E#", "F", "F#",
+            "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B",
+            "B#", "C", "C#",
+         };
+         static const char* names_19edo_flats[19] = {
+            "Db", "D", "D#", "Eb", "E", "Fb", "F", "F#",
+            "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B",
+            "Cb", "C", "C#",
+         };
+         if (flat)
+            base = names_19edo_flats[step];
+         else
+            base = names_19edo_sharps[step];
+         break;
+      case 31:
+         static const char* names_31edo[31] = {
+            "Gb", "Fx", "G", "Abb", "G#", "Ab", "Gx", "A",
+            "Bbb", "A#", "Bb", "Ax", "B", "Cb", "B#", "C",
+            "Dbb", "C#", "Db", "Cx", "D", "Ebb", "D#",
+            "Eb", "Dx", "E", "Fb", "E#", "F", "Gbb", "F#",
+         };
+         base = names_31edo[step];
+         break;
+      case 12:
+      default:
+         return NoteName(pitch, flat, includeOctave);
+   }
+
+   if (includeOctave)
+      base += ofToString(octave);
+   return base;
+}
+
 int PitchFromNoteName(std::string noteName)
 {
    int octave = -2;
@@ -11637,7 +11703,7 @@ namespace
       {
          fprintf(logAllocationsFile, "%-90s:  LINE %5d,  ADDRESS %08x  %8d newed\n", fname, lnum, addr, asize);
          /*AllocInfo* info = (AllocInfo*)malloc(sizeof(AllocInfo));
-         
+
          info->address = addr;
          strncpy(info->file, fname, maxFilenameLen-1);
          info->file[maxFilenameLen-1] = 0;

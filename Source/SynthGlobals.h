@@ -195,6 +195,7 @@ void Mult(float* buff1, const float* buff2, int bufferSize);
 void Clear(float* buffer, int bufferSize);
 void BufferCopy(float* dst, const float* src, int bufferSize);
 std::string NoteName(int pitch, bool flat = false, bool includeOctave = false);
+std::string MicrotonalNoteName(int pitch, int ppo, bool flat = false, bool includeOctave = false);
 int PitchFromNoteName(std::string noteName);
 float Interp(float a, float start, float end);
 double GetPhaseInc(float freq);
